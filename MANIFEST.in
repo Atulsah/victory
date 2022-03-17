@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include victory *.css
+recursive-include victory *.csv
+recursive-include victory *.html
+recursive-include victory *.ico
+recursive-include victory *.js
+recursive-include victory *.json
+recursive-include victory *.md
+recursive-include victory *.png
+recursive-include victory *.py
+recursive-include victory *.svg
+recursive-include victory *.txt
+recursive-exclude victory *.pyc
