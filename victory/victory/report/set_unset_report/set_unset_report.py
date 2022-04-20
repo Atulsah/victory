@@ -23,19 +23,34 @@ def execute(filters):
 
 def set_unset_report(filters):
 	data = []
+	ordered_items_map={}
+	items = set_unset_item(filters)
+	for i in items:
+		data.append([0, i.item_code, i.item_name, "", "", "", "", "", "", ""])
+		s_items= product_bundle_items(i.item_code)
+		ordered_items_map = get_order_dispatch_qty(filters, s_items)
+		for j in s_items:
+			op_stock= get_opening_balance_from_slee(j.item_code,filters.from_date,filters.warehouse)
+			production_qty= get_production_qty(filters, j.item_code)
+			ordered_qty= ordered_items_map.get(j.item_code, {}).get("oqty")
+			delivered_qty= ordered_items_map.get(j.item_code, {}).get("dqty")
+			pending_qty= flt(ordered_qty - delivered_qty) if ordered_qty and ordered_qty > delivered_qty else 0
+			closing_stock= get_closing_stock_from_bin(j.item_code, filters.warehouse)
+			remain_qty= flt(pending_qty - closing_stock) if pending_qty else 0
+			data.append([1, j.item_code, j.item_name, op_stock,production_qty, ordered_qty, delivered_qty, pending_qty, closing_stock, remain_qty])
+
 
 	return data
 
 def set_unset_item(filters):
 	items = frappe.db.sql("""
 		select 
-			item_code, item_name, foreign_buyer_name
+			item_code, item_name, buyer
 		from 
 			`tabItem` item
 		where 
-			item.company=%(company)s and item.foreign_buyer_name =%(buyer)s
-			item.pch_made = "10" """,
-			{'company':filters.company, 'buyer':filters.foreign_buyer_name},
+			item.buyer =%(buyer)s and item.pch_made = '10' """,
+			{'buyer':filters.foreign_buyer_name},
 		as_dict=1)
 
 	return items
@@ -51,9 +66,53 @@ def product_bundle_items(item_code):
 		where 
 			pbi.parent=pb.name and pb.new_item_code = %s """,(item_code),as_dict=1)
 
-def get_order_dispatch_qty(item_code):
+def get_order_dispatch_qty(filters, set_items):
+	ordered_items_map={}
+	ordered_items = frappe.db.sql("""
+		select 
+			so_item.item_code as item_code,
+			so_item.item_name as item_name,
+			so_item.stock_uom as uom, 
+			ifnull(sum(so_item.qty),0) as ordered_qty,
+			ifnull(sum(so_item.delivered_qty),0) as delivered_qty 
+		from 
+			`tabSales Order Item` so_item,`tabSales Order` so 
+		where 
+			so.company=%(company)s and so.foreign_buyer_name =%(buyer)s 
+			and so_item.parent=so.name and so.docstatus=1 
+		group by 
+			so_item.item_code""",
+			{'company':filters.company, 'buyer':filters.foreign_buyer_name},
+		as_dict=1) 
 
-	return data
+	for d in ordered_items:
+		for i in set_items:
+			if d.item_code == i.item_code:
+				pkd_list=product_bundle_items(d.item_code)
+				for p in pkd_list:
+					if p.item_code in ordered_items_map:
+						ordered_items_map[p.item_code]["oqty"] = ordered_items_map[p.item_code]["oqty"] + flt(d.ordered_qty * p.qty) 
+						ordered_items_map[p.item_code]["dqty"] = ordered_items_map[p.item_code]["dqty"] + flt(d.delivered_qty* p.qty)
+					else:
+						ordered_items_map.setdefault(p.item_code, frappe._dict())
+						ordered_items_map[p.item_code]["item_name"] = p.item_name
+						ordered_items_map[p.item_code]["oqty"] = flt(d.ordered_qty * p.qty)
+						ordered_items_map[p.item_code]["dqty"] = flt(d.delivered_qty* p.qty)
+						ordered_items_map[p.item_code]["uom"]  = d.uom
+
+		else:
+			if d.item_code in ordered_items_map:
+				ordered_items_map[d.item_code]["oqty"] = ordered_items_map[d.item_code]["oqty"] + flt(d.ordered_qty) 
+				ordered_items_map[d.item_code]["dqty"] = ordered_items_map[d.item_code]["dqty"] + flt(d.delivered_qty) 
+			else:
+				ordered_items_map.setdefault(d.item_code, frappe._dict())
+				ordered_items_map[d.item_code]["item_name"] = d.item_name
+				ordered_items_map[d.item_code]["oqty"] = flt(d.ordered_qty)
+				ordered_items_map[d.item_code]["dqty"] = flt(d.delivered_qty)
+				ordered_items_map[d.item_code]["uom"]  = d.uom
+		
+	
+	return ordered_items_map
 
 def get_opening_balance_from_slee(item_code,posting_date,warehouse):
 	balance_qty = frappe.db.sql("""select qty_after_transaction from `tabStock Ledger Entry`
