@@ -2,7 +2,6 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-from dataclasses import dataclass
 from warnings import filters
 import frappe
 from frappe import _
