@@ -17,7 +17,6 @@ def execute(filters):
 	columns = get_columns() 
 	data = []
 	data = set_unset_report(filters)
-
 	return columns, data
 
 def set_unset_report(filters):
