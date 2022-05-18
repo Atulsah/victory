@@ -13,7 +13,6 @@ from frappe.utils import getdate, date_diff,add_days, add_years, cstr,formatdate
 
 
 def execute(filters):
-
 	columns = get_columns() 
 	data = []
 	data = set_unset_report(filters)
@@ -21,17 +20,17 @@ def execute(filters):
 
 def set_unset_report(filters):
 	data = []
-	ordered_items_map={}
+	ordered_items_map_one={}
 	items = set_unset_item(filters)
 	for i in items:
 		data.append([0, i.item_code, i.item_name, "", "", "", "", "", "", ""])
 		s_items= product_bundle_items(i.item_code)
-		ordered_items_map = get_order_dispatch_qty(filters, s_items)
+		ordered_items_map_one= get_order_dispatch_qty(filters, s_items)
 		for j in s_items:
 			op_stock= get_opening_balance_from_slee(j.item_code,filters.from_date,filters.warehouse)
 			production_qty= get_production_qty(filters, j.item_code)
-			ordered_qty= ordered_items_map.get(j.item_code, {}).get("oqty")
-			delivered_qty= ordered_items_map.get(j.item_code, {}).get("dqty")
+			ordered_qty= ordered_items_map_one.get(j.item_code, {}).get("oqty")
+			delivered_qty= ordered_items_map_one.get(j.item_code, {}).get("dqty")
 			pending_qty= flt(ordered_qty - delivered_qty) if ordered_qty and ordered_qty > delivered_qty else 0
 			closing_stock= get_closing_stock_from_bin(j.item_code, filters.warehouse)
 			remain_qty= flt(pending_qty - closing_stock) if pending_qty else 0
