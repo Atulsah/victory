@@ -8,16 +8,19 @@
  "field_order": [
   "buyer",
   "spreadsheet_name",
-  "worksheet_name",
   "entry_type",
-  "date"
+  "column_break_4",
+  "warehouse",
+  "worksheet_name",
+  "date",
+  "company"
  ],
  "fields": [
   {
    "fieldname": "buyer",
    "fieldtype": "Link",
    "label": "Buyer",
-   "options": "Customer"
+   "options": "Brand"
   },
   {
    "fieldname": "entry_type",
@@ -40,12 +43,28 @@
    "fieldname": "worksheet_name",
    "fieldtype": "Data",
    "label": "Worksheet Name"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-05-18 10:30:38.695079",
+ "modified": "2022-05-19 11:16:33.253660",
  "modified_by": "Administrator",
  "module": "Victory",
  "name": "Production Entry",

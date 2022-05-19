@@ -8,13 +8,15 @@ from frappe.model.document import Document
 from frappe.utils import getdate
 #import os.path
 from google.oauth2.service_account import Credentials
-from google.oauth2 import service_account
+#from google.oauth2 import service_account
 import gspread
 
 class ProductionEntry(Document):
 
     def validate(self):
-        self.get_data_from_sheet()
+        items = self.get_data_from_sheet()
+        msg = self.create_stock_entry(items)
+        frappe.msgprint(msg)
 
     def get_data_from_sheet(self):
         scopes = [
@@ -39,39 +41,56 @@ class ProductionEntry(Document):
         sh = gc.open(self.spreadsheet_name)
         wks = sh.worksheet(self.worksheet_name)
         items = wks.get_all_records()
-        self.create_stock_entry(items)
+        return items
+        
 
+     
+    def create_stock_entry(self, items):
         mydate = getdate(self.date).strftime("%d")
         entry_date = self.entry_type + "_" + mydate
-
-        for i in items:
-            if self.buyer == i['buyer']:
-                if i[entry_date] > 0:
-                    print(i['buyer'], i['item_code'], i[entry_date])
-
-        #stock_entry_items = []
-
-
-
-    
-            
-    def create_stock_entry(doc, handler=""):
+        serise = "MAT/"+self.buyer+"-"+self.date+"/"
+        print(serise)
+        print(items)
         se = frappe.new_doc("Stock Entry")
         se.update({ 
-            "purpose": "Material Transfer" , 
-            "stock_entry_type": "Material Transfer" , 
-            "from_warehouse": "Reservation Warehouse - G" , 
-            "to_warehouse": "Finished Goods - G"
+            "serise": serise,
+            "stock_entry_type": "Material Receipt",
+            "company":self.company,
+            "purpose": "Manufacture", 
+            "set_posting_time" : 1,
+            "posting_date" : self.date,
+            "posting_time" : "09:00:00",
+            "to_warehouse": self.warehouse,
+            #"buyer": self.buyer
         })
-        for se_item in doc.items:
-            se.append("items", { 
-                "item_code":se_item.item_code, 
-                "item_group": se_item.item_group, 
-                "item_name":se_item.item_name, 
-                "amount":se_item.amount, 
-                "qty": se_item.qty , 
-                "uom":se_item.uom, 
-                "conversion_factor": se_item.conversion_factor }) 
-        frappe.msgprint('Stock Entry is created please submit the stock entry')
+        print("1---------------")
+        print(se)
+        for se_item in items:
+            print("2---------------")
+            if self.buyer == se_item['buyer']:
+                print("3---------------")
+                if se_item[entry_date] > 0:
+                    print("4---------------")
+                    se.append("items", { 
+                        "t_warehouse":self.warehouse,
+                        "item_code":se_item['item_code'],
+                        #"item_name":se_item.item_name, 
+                        "qty": se_item[entry_date],
+                        "transfer_qty" : se_item[entry_date],
+                        "uom":se_item['uom'],
+                        "stock_uom":se_item['uom'],
+                        "conversion_factor": 1,
+                        "valuation_rate":1
+                    }) 
+                    print(se_item['item_code'],"-", se_item[entry_date], "-", se_item['uom'] )
+        
+        
+        print(se)
         se.insert()
-        se.save()         
+        se.save()
+        name = se.name
+        print(se)         
+        msg = "Stock Entry has been created for " + self.buyer + " items for the date : " + self.date +" and Saved in Draft from. Please Submit the Stock entry. ( " + se.name + " ) "
+        return msg
+
+#frappe.get_last_doc('Stock Entry', filters={"name": se.name})
