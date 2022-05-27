@@ -101,7 +101,7 @@ class ProductionEntry(Document):
                         "qty": se_item[entry_date],
                         "transfer_qty" : se_item[entry_date],
                         "uom":se_item['uom'],
-                        "stock_uom":se_item['uom'],
+                        "stock_uom":se_item['UOM'],
                         "conversion_factor": 1,
                         "valuation_rate":1
                     }) 
