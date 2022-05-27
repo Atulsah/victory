@@ -100,12 +100,11 @@ class ProductionEntry(Document):
                         "item_code":se_item['Item_code'],
                         "qty": se_item[entry_date],
                         "transfer_qty" : se_item[entry_date],
-                        "uom":se_item['uom'],
+                        "uom":se_item['UOM'],
                         "stock_uom":se_item['UOM'],
                         "conversion_factor": 1,
                         "valuation_rate":1
-                    }) 
-                    print(se_item['Item_code'],"-", se_item[entry_date], "-", se_item['UOM'] )
+                    })
         
         
         print(se)
