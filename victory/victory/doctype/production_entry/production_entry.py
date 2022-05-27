@@ -37,7 +37,7 @@ import gspread
     wks = sh.worksheet("APR_22") # for Worksheet Name
     items = wks.get_all_records() # will import all data from worksheet
     for i in items:
-        print(i['Item_code'], i['Item_Name'], i['IN_01'])
+       print(i['Item_code'], i['Item_Name'], i['IN_01'])
 """
 
 class ProductionEntry(Document):
@@ -92,18 +92,12 @@ class ProductionEntry(Document):
             "to_warehouse": self.warehouse,
             #"buyer": self.buyer
         })
-        print("1---------------")
-        print(se)
         for se_item in items:
-            print("2---------------")
             if self.buyer == se_item['Buyer']:
-                print("3---------------")
                 if se_item[entry_date] > 0:
-                    print("4---------------")
                     se.append("items", { 
                         "t_warehouse":self.warehouse,
                         "item_code":se_item['Item_code'],
-                        #"item_name":se_item.item_name, 
                         "qty": se_item[entry_date],
                         "transfer_qty" : se_item[entry_date],
                         "uom":se_item['uom'],
