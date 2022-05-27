@@ -94,7 +94,7 @@ class ProductionEntry(Document):
         })
         for se_item in items:
             if self.buyer == se_item['Buyer']:
-                if se_item[entry_date] != "0":
+                if se_item[entry_date] > 0:
                     se.append("items", { 
                         "t_warehouse":self.warehouse,
                         "item_code":se_item['Item_code'],
