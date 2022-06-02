@@ -86,6 +86,7 @@ class ProductionEntry(Document):
             "stock_entry_type": "Material Receipt",
             "company":self.company,
             "purpose": "Manufacture", 
+            "type": "Manufacture",
             "set_posting_time" : 1,
             "posting_date" : self.date,
             "posting_time" : "09:00:00",
@@ -110,7 +111,6 @@ class ProductionEntry(Document):
         print(se)
         se.insert()
         se.save()
-        name = se.name
         print(se)   
              
         msg = "Stock Entry has been created for " + self.buyer + " items for the date : " + self.date +" and Saved in Draft from. Please Submit the Stock entry. ( " + se.name + " ) "
