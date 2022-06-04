@@ -1,37 +1,25 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-05-17 11:12:49.434369",
+ "creation": "2022-06-03 10:20:54.110045",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "buyer",
+  "company",
   "spreadsheet_name",
-  "entry_type",
-  "column_break_4",
-  "warehouse",
-  "worksheet_name",
   "date",
-  "company"
+  "column_break_4",
+  "buyer",
+  "warehouse",
+  "worksheet_name"
  ],
  "fields": [
   {
-   "fieldname": "buyer",
+   "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Buyer",
-   "options": "Brand"
-  },
-  {
-   "fieldname": "entry_type",
-   "fieldtype": "Select",
-   "label": "Entry Type",
-   "options": "In\nOut"
-  },
-  {
-   "fieldname": "date",
-   "fieldtype": "Date",
-   "label": "Date"
+   "label": "Company",
+   "options": "Company"
   },
   {
    "fieldname": "spreadsheet_name",
@@ -40,9 +28,19 @@
    "options": "CI ITEM SHEET\nDI ITEM SHEET\nVALVE BOX SHEET"
   },
   {
-   "fieldname": "worksheet_name",
-   "fieldtype": "Data",
-   "label": "Worksheet Name"
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "buyer",
+   "fieldtype": "Link",
+   "label": "Buyer",
+   "options": "Brand"
   },
   {
    "fieldname": "warehouse",
@@ -51,23 +49,18 @@
    "options": "Warehouse"
   },
   {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company"
+   "fieldname": "worksheet_name",
+   "fieldtype": "Data",
+   "label": "Worksheet Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-06-04 10:54:43.320782",
+ "modified": "2022-06-03 10:20:54.110045",
  "modified_by": "Administrator",
  "module": "Victory",
- "name": "Production Entry",
+ "name": "Stock Opening Reconciliation",
  "owner": "Administrator",
  "permissions": [
   {
